@@ -6,8 +6,8 @@
 module TinyML.Main
 
 open System
-open FSharp.Common
 open TinyML.Ast
+open FSharp.Common
 
 let parse_from_TextReader rd filename parser = Parsing.parse_from_TextReader SyntaxError rd filename (1, 1) parser Lexer.tokenize Parser.tokenTagToTokenId
     
@@ -15,10 +15,14 @@ let interpret_expr tenv venv e =
     #if DEBUG
     printfn "AST:\t%A\npretty:\t%s" e (pretty_expr e)
     #endif
-    let t = Typing.typecheck_expr tenv e
+    let (t, s) = Typing.typeinfer_expr Typing.gamma_scheme0 e
     #if DEBUG
-    printfn "type:\t%s" (pretty_ty t)
+    printfn "type inferred:\t%s" (pretty_ty t)
     #endif
+    // let t = Typing.typecheck_expr tenv e
+    // #if DEBUG
+    // printfn "type:\t%s" (pretty_ty t)
+    // #endif
     let v = Eval.eval_expr venv e
     #if DEBUG
     printfn "value:\t%s\n" (pretty_value v)
